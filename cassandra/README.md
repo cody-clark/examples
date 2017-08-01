@@ -44,10 +44,12 @@ To complete this tutorial, you should already have a basic familiarity with [Pod
 * Have a supported Kubernetes Cluster running
 
 **Note:** Please read the [getting started guides](https://kubernetes.io/docs/setup/pick-right-solution/) if you do not already have a cluster. 
+{: .note}
 
 ### Additional Minikube Setup Instructions
 
 **Warning:** [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube/) defaults to 1024MB of memory and 1 CPU which results in an insufficient resource errors. 
+{: warning}
 
 To avoid these errors, run minikube with:
 
@@ -62,7 +64,7 @@ A Kubernetes [Service](https://kubernetes.io/docs/concepts/services-networking/s
 
 The following `Service` is used for DNS lookups between Cassandra pods and clients within the Kubernetes Cluster.
 
-1. `cd` to the folder you saved the .yaml files.
+1. `cd` to the folder you saved the `.yaml` files.
 2. Create a `Service` to track all Cassandra StatefulSet Nodes from the following `.yaml` file:
 
 ```shell
@@ -79,7 +81,7 @@ Get the Cassandra `Service`.
 kubectl get svc cassandra
 ```
 
-The response should be
+The response should be similar to this:
 
 ```console
 NAME        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
@@ -93,6 +95,7 @@ If anything else returns, the service was not successfully created. Read [Debug 
 The StatefulSet manifest, included below, creates a Cassandra ring that consists of three pods.
 
 **Note:** This example uses the default provisioner for Minikube. Please update the following StatefulSet for the cloud you are working with. 
+{: .note}
 
 1. Update the StatefulSet if necessary.
 2. Create the Cassandra StatefulSet from the following `.yaml` file:
@@ -111,7 +114,7 @@ kubectl create -f cassandra-statefulset.yaml
 kubectl get statefulset cassandra
 ```
 
-   The response should be
+   The response should be similar to this:
 
 ```console
 NAME        DESIRED   CURRENT   AGE
@@ -123,19 +126,23 @@ cassandra   3         0         13s
 {:start="2"}
 2. Get the Pods to see the ordered creation status:
 
-```shell
+```console 
 kubectl get pods -l="app=cassandra"
+```
+The response should be similar to this:
+
+```shell
 NAME          READY     STATUS              RESTARTS   AGE
 cassandra-0   1/1       Running             0          1m
 cassandra-1   0/1       ContainerCreating   0          8s
 ```
 
 **Note:** It can take up to ten minutes for all three pods to deploy. 
+{: .note}
 
-Once all pods are deployed, the same command returns:
+Once all pods are deployed, the same command returns something similar to this:
 
 ```shell
-kubectl get pods -l="app=cassandra"
 NAME          READY     STATUS    RESTARTS   AGE
 cassandra-0   1/1       Running   0          10m
 cassandra-1   1/1       Running   0          9m
@@ -171,6 +178,7 @@ kubectl edit statefulset cassandra
    This command opens an editor in your terminal. The line you need to change is `Replicas`.
    
    **Note:** The following sample is an excerpt of the StatefulSet file.
+   {: .note}
 
 ```console
 # Please edit the object below. Lines beginning with a '#' will be ignored,
@@ -198,13 +206,13 @@ spec:
 
    The StatefulSet now contains 4 pods.
 
-3. Get the Cassandra StatefulSet to verify:
+3. Get the Cassandra StatefulSet to verify the number of replicas:
 
 ```shell
 kubectl get statefulset cassandra
 ```
 
-  The response should be
+  The response should be this:
 
 ```console
 NAME        DESIRED   CURRENT   AGE
@@ -215,7 +223,8 @@ cassandra   4         4         36m
 {% capture cleanup %}
 Deleting or scaling a StatefulSet down does not delete the volumes associated with the StatefulSet. This ensures safety first: your data is more valuable than an auto purge of all related StatefulSet resources. 
 
-**Warning:** Depending on the storage class and reclaim policy, deleting the Persistent Volume Claims may cause the associated volumes to also be deleted. Never assume you’ll be able to access data if its volume claims are deleted. 
+**Warning:** Depending on the storage class and reclaim policy, deleting the Persistent Volume Claims may cause the associated volumes to also be deleted. Never assume you’ll be able to access data if its volume claims are deleted.
+{: .warning}
 
 1. Run the following commands to delete everything in a `StatefulSet`:
 
@@ -226,7 +235,7 @@ grace=$(kubectl get po cassandra-0 -o=jsonpath='{.spec.terminationGracePeriodSec
   && sleep $grace \
   && kubectl delete pvc -l app=cassandra
 ```
-
+{:start="2"}
 2. Run the following command to delete the Cassandra `Service`.
 
 ```shell
